@@ -1,0 +1,10 @@
+API Call Agent: Là code cũ không sử dụng nữa sao ý
+IDENTIFICATION: là API về BHXH-BHYT. Document với postmen đặt tên là BHYT nên chú ý
+    + token bị đổi không thể request đến APIcore
+General_control: Là file chứa các hàm sử dụng chung trong các APIs
+
+TTS: if volumn < 0.2 or volumn > 5: bị sai so với document
+
+@TTS.get('/tts/task/get/{task_id}' (get task resulft): RESPONSE luôn trả về proccessing...
+
+VOICE_BIO: chưa thực hiện được task check audio, đăng ký 16k, 8k, xác thực 16k và 8k
