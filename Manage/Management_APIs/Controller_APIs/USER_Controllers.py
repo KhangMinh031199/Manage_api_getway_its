@@ -1,8 +1,9 @@
 from bson.objectid import ObjectId
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from datetime import datetime
 import re
 
+mybd = mongo_create()
 
 def get_service_info(service_id):
     if not isinstance(service_id, ObjectId):

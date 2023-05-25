@@ -1,8 +1,9 @@
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from bson.objectid import ObjectId
 from datetime import datetime
 import sys
 
+mydb = mongo_create()
 def get_user_id_voiceid():
     voiceid = mydb.services.find_one({'sign': 'voiceid'})
     for x in voiceid.get("api_routing"):

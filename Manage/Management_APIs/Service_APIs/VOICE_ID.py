@@ -4,12 +4,13 @@ from Manage.Authentication.Token import get_current_active_user
 from fastapi_limiter.depends import RateLimiter
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage.Management_APIs.Controller_APIs import VOICE_ID_Controllers, General_control
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import os
 import json
 import requests
 from Manage import setting
 
+mydb = mongo_create()
 VoiceID=APIRouter(tags=['VoiceID'])
 
 @VoiceID.post("/voiceid/speakers/create", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])

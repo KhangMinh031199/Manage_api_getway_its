@@ -5,7 +5,7 @@ from fastapi import Depends, Query, Form, APIRouter, HTTPException, status
 from Manage.Authentication.Token import get_current_active_user
 from typing import Optional
 from bson.objectid import ObjectId
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import pymongo
 from Manage.Management_APIs.Controller_APIs import USER_Controllers, General_control
 import secrets
@@ -13,6 +13,7 @@ from Manage.Authentication.Hash_Password import Hash
 from Manage.Management_APIs.Schemas import Schemas_share
 import bson
 
+mydb =  mongo_create()
 
 USER=APIRouter(tags=['User'])
 
