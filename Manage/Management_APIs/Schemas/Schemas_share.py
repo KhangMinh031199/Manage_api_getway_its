@@ -1,5 +1,6 @@
 from bson.objectid import ObjectId
 import pydantic
+import struct
 from pydantic import BaseModel
 
 class BeeObjectId(ObjectId):

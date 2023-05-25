@@ -1,10 +1,10 @@
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import hashlib
 import re
 from Manage.Management_APIs.Controller_APIs import General_control
 from datetime import datetime
 
-
+mydb=mongo_create()
 TIME_RENEW_DATABASE = 2592000  # 1 month
 
 def get_request_id_lookup():

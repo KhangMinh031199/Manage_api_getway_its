@@ -1,9 +1,11 @@
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import secrets
 import requests
 import json
 from bson import ObjectId
 from Manage.Management_APIs.Controller_APIs import General_control
+
+mydb = mongo_create()
 
 def get_link_function_callagent(apifunction):
     callagent = mydb.services.find_one({"sign": "callagent"})
@@ -14,6 +16,7 @@ def get_link_function_callagent(apifunction):
 def get_callagent_token():
     #url = General_control.get_link_function_service('get_callagent_token','callagent')
     url = General_control.get_link_function_service('get_token_callagent',"callagent")
+    print("====get_callagent_token")
     print(url)
     url="http://125.212.225.71:8344/smartseller/auth/login"
 

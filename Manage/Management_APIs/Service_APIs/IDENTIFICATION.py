@@ -2,10 +2,12 @@ from fastapi import APIRouter, Depends, Form
 from Manage.Authentication.Token import get_current_active_user
 from fastapi_limiter.depends import RateLimiter
 from Manage.Management_APIs.Controller_APIs import General_control, IDENTIFICATION_Controllers
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from Manage.Management_APIs.Schemas import Schemas_share
 import requests
 from Manage import setting
+
+mydb=mongo_create()
 
 IDENTIFICATION=APIRouter(tags=['IDENTIFICATION'])
 

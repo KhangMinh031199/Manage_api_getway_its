@@ -1,8 +1,8 @@
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from Manage.Management_APIs.Controller_APIs import General_control
 
 TIME_RENEW_DATABASE = 2592000  # 1 month
-
+mydb=mongo_create()
 def get_link_function_identification(apifunction):
     identification = mydb.services.find_one({"sign": "identification"})
     for x in identification.get("api_routing"):

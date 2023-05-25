@@ -7,9 +7,10 @@ from Manage.Management_APIs.Controller_APIs import CALL_BOT_Controllers, General
 import json
 import secrets
 import requests
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from Manage import setting
 
+mydb = mongo_create()
 CALL_BOT=APIRouter(tags=['Call Bot'])
 
 @CALL_BOT.post('/call/bot', dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])

@@ -4,11 +4,14 @@ from datetime import datetime
 import sys
 
 mydb = mongo_create()
+
+
 def get_user_id_voiceid():
     voiceid = mydb.services.find_one({'sign': 'voiceid'})
     for x in voiceid.get("api_routing"):
         if x.get("api_function") == 'user_id':
             return x.get('link')
+
 
 def get_link_function_voiceid(apifunction):
     voiceid = mydb.services.find_one({"sign": "voiceid"})

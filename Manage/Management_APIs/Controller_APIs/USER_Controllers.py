@@ -2,8 +2,7 @@ from bson.objectid import ObjectId
 from Manage.mongo_connect import mongo_create
 from datetime import datetime
 import re
-
-mybd = mongo_create()
+mydb=mongo_create()
 
 def get_service_info(service_id):
     if not isinstance(service_id, ObjectId):
@@ -43,6 +42,7 @@ def get_service_registered(client_id):
         service['limit_request'] = x['limit_request']
         service['remaining_request'] = x['remaining_request']
         services.append(service)
+
     return services
 
 def check_password(pw):

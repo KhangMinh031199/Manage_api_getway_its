@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, Depends, Form
 from typing import Optional, Generic
 from Manage.Management_APIs.Schemas import Schemas_share
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from Manage.Management_APIs.Controller_APIs import FACE_ID_Controllers, General_control
 from fastapi_limiter.depends import RateLimiter
 import secrets
@@ -10,7 +10,8 @@ from Manage.Authentication.Token import get_current_active_user
 import os
 from Manage import setting
 
-FaceID=APIRouter(tags=['FaceID'])
+mydb = mongo_create()
+FaceID = APIRouter(tags=['FaceID'])
 
 @FaceID.post("/cloudekyc/faceid/verification", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def cloudekyc_faceid_verification(image_card: UploadFile = File(...), image_live: UploadFile = File(...),

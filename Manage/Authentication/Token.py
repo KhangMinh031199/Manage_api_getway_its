@@ -8,7 +8,8 @@ from Manage.mongo_connect import mongo_create
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage import setting
 
-mydb = mongo_create()
+mydb=mongo_create()
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

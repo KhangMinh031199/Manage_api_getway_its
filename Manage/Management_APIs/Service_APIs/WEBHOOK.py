@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, Form
 from fastapi_limiter.depends import RateLimiter
 from Manage.Authentication.Token import get_current_active_user
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from bson.objectid import ObjectId
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage import setting
 
+mydb=mongo_create()
 WEBHOOK=APIRouter(tags=["Webhook"])
 
 @WEBHOOK.post('/register_webhook', dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
