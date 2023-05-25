@@ -5,7 +5,7 @@ from fastapi import Depends, Query, Form, APIRouter, HTTPException, status
 from Manage.Authentication.Token import get_current_active_user
 from typing import Optional
 from bson.objectid import ObjectId
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import pymongo
 from Manage.Management_APIs.Controller_APIs import USER_Controllers, General_control
 import secrets
@@ -13,6 +13,7 @@ from Manage.Authentication.Hash_Password import Hash
 from Manage.Management_APIs.Schemas import Schemas_share
 import bson
 
+mydb=mongo_create()
 
 USER=APIRouter(tags=['User'])
 
@@ -45,7 +46,6 @@ async def log_current_user(callbot_id: Optional[str] = None, page_size: int = Qu
 
 @USER.get("/user/services")
 async def info_registered_service(current_user: Schemas_share.User = Depends(get_current_active_user)):
-    print("======", current_user.get('_id'))
     return USER_Controllers.get_service_registered(current_user.get('_id'))
 
 @USER.get("/user/get_full_services")
@@ -199,6 +199,6 @@ async def change_password(old_password: str = Form(...), new_password: str = For
             if USER_Controllers.check_password(new_password) is False:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Your password must be 8-16 characters, and include at least one lowercase letter, one uppercase letter,a number and a special character!")
             else:
-                new_pass=Hash.get_password_hash(new_password)
+                new_pass = Hash.get_password_hash(new_password)
                 mydb.clients.update_one({'_id': current_user['_id']},{"$set": {'password': new_pass}})
                 return HTTPException(status_code=status.HTTP_202_ACCEPTED, detail="Change password have successfuly!!!")

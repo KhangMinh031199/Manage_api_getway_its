@@ -1,6 +1,7 @@
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from bson.objectid import ObjectId
 
+mydb=mongo_create()
 def get_remaining_voice(client_id, service_id):
     if not isinstance(client_id, ObjectId):
         client_id = ObjectId(client_id)

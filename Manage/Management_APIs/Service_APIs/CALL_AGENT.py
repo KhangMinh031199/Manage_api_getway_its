@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, Depends
 from fastapi_limiter.depends import RateLimiter
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage.Authentication.Token import get_current_active_user
 from Manage.Management_APIs.Controller_APIs import CALL_AGENT_Controllers, General_control
@@ -9,14 +9,17 @@ import requests
 import json
 from Manage import setting
 
-CALL_AGENT=APIRouter(tags=['Call Agent'])
+mydb = mongo_create()
+
+CALL_AGENT = APIRouter(tags=['Call Agent'])
 
 @CALL_AGENT.post("/call/agent", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def callagent_call_agent(hotline: str = Form(...), agent_phone: str = Form(...), called: str = Form(...), cus_id: str = Form(...), limit_time: str = Form(None),
                                current_user: Schemas_share.User = Depends(get_current_active_user)):
 
     url = General_control.get_link_function_service('callagent_call_agent',"callagent")
-    url="http://125.212.225.71:8344/smartseller/v1/call/agent"
+    print(url)
+    url = "http://125.212.225.71:8344/smartseller/v1/call/agent"
     url_gw = setting.BASE_URL + "/call/agent"
     service_id = str(mydb.services.find_one({'sign': 'callagent'}).get('_id'))
 

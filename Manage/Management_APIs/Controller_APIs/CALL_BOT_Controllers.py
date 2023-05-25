@@ -1,11 +1,12 @@
 from fastapi import Form
 from typing import List
 import json
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import secrets
 import requests
 from bson.objectid import ObjectId
 
+mydb=mongo_create()
 def call_param_dict(call_params: List[str] = Form(...)):
     try:
         return list(map(json.loads, call_params))

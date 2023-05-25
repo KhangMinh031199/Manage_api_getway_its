@@ -3,12 +3,13 @@ from fastapi_limiter.depends import RateLimiter
 from Manage.Authentication.Token import get_current_active_user
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage.Management_APIs.Controller_APIs import General_control, VOICE_BIO_Controllers
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import requests
 import os
 import json
 from Manage import setting
 
+mydb=mongo_create()
 VOICE_BIO=APIRouter(tags=['VoiceBio'])
 
 

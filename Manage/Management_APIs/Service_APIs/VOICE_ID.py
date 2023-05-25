@@ -4,15 +4,19 @@ from Manage.Authentication.Token import get_current_active_user
 from fastapi_limiter.depends import RateLimiter
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage.Management_APIs.Controller_APIs import VOICE_ID_Controllers, General_control
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import os
 import json
 import requests
 from Manage import setting
 
-VoiceID=APIRouter(tags=['VoiceID'])
+mydb = mongo_create()
 
-@VoiceID.post("/voiceid/speakers/create", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+VoiceID = APIRouter(tags=['VoiceID'])
+
+
+@VoiceID.post("/voiceid/speakers/create", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def voiceid_speakers_create(speaker_id: str = Form(...), files: List[UploadFile] = File(...),
                                   current_user: Schemas_share.User = Depends(get_current_active_user)):
     url_gw = setting.BASE_URL + "/voiceid/speakers/create"
@@ -30,7 +34,7 @@ async def voiceid_speakers_create(speaker_id: str = Form(...), files: List[Uploa
                 'msg': "Không được để trống file"
             }
             General_control.save_log(current_user.get("_id"), current_user.get('name'), 'voiceid',
-                         General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
             return client_response
 
     if len(files) != 3:
@@ -39,7 +43,7 @@ async def voiceid_speakers_create(speaker_id: str = Form(...), files: List[Uploa
             'msg': "Không đủ 3 file audio"
         }
         General_control.save_log(current_user.get("_id"), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
 
     service_id = str(mydb.services.find_one({'sign': 'voiceid'}).get('_id'))
@@ -50,7 +54,7 @@ async def voiceid_speakers_create(speaker_id: str = Form(...), files: List[Uploa
             'msg': "Too limit"
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -85,15 +89,17 @@ async def voiceid_speakers_create(speaker_id: str = Form(...), files: List[Uploa
         if os.path.exists('file/' + file.filename):
             os.remove('file/' + file.filename)
 
-    General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid', General_control.getNOW(), url,
+    General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid', General_control.getNOW(),
+                             url,
                              client_request, response.json(), client_request, response.json(), url_gw)
     VOICE_ID_Controllers.update_user_id_voiceid()
     return response.json()
 
-###
-@VoiceID.get("/voiceid/speakers", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
-async def voiceid_speakers(current_user: Schemas_share.User = Depends(get_current_active_user)):
 
+###
+@VoiceID.get("/voiceid/speakers", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+async def voiceid_speakers(current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_speakers')
     url_gw = setting.BASE_URL + "/voiceid/speakers"
     service_id = str(mydb.services.find_one({'sign': 'voiceid'}).get('_id'))
@@ -104,7 +110,7 @@ async def voiceid_speakers(current_user: Schemas_share.User = Depends(get_curren
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, '', client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, '', client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -113,14 +119,13 @@ async def voiceid_speakers(current_user: Schemas_share.User = Depends(get_curren
 
     response = requests.request("GET", url, headers=headers, data=payload)
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, '', response.json(), '', response.json(), url_gw)
+                             General_control.getNOW(), url, '', response.json(), '', response.json(), url_gw)
     return response.json()
 
 
-
-@VoiceID.get("/voiceid/speakers/{speaker_id}", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+@VoiceID.get("/voiceid/speakers/{speaker_id}", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def voiceid_speakers_detail(speaker_id: str, current_user: Schemas_share.User = Depends(get_current_active_user)):
-
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_speakers_detail') + str(speaker_id)
     url_gw = setting.BASE_URL + f"/voiceid/speakers/{speaker_id}"
     client_request = {
@@ -135,7 +140,7 @@ async def voiceid_speakers_detail(speaker_id: str, current_user: Schemas_share.U
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, '', client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, '', client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -144,11 +149,13 @@ async def voiceid_speakers_detail(speaker_id: str, current_user: Schemas_share.U
 
     response = requests.request("GET", url, headers=headers, data=payload)
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, client_request, response.json(), client_request, response.json(), url_gw)
+                             General_control.getNOW(), url, client_request, response.json(), client_request,
+                             response.json(), url_gw)
     return response.json()
 
 
-@VoiceID.put("/voiceid/speakers/update", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+@VoiceID.put("/voiceid/speakers/update", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def voiceid_speakers_update(speaker_id: str = Form(...), files: List[UploadFile] = File(...),
                                   current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_speakers_update')
@@ -164,7 +171,7 @@ async def voiceid_speakers_update(speaker_id: str = Form(...), files: List[Uploa
                 'msg': "Không được để trống file"
             }
             General_control.save_log(current_user.get("_id"), current_user.get('name'), 'voiceid',
-                         General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
             return client_response
 
     if len(files) != 3:
@@ -173,7 +180,7 @@ async def voiceid_speakers_update(speaker_id: str = Form(...), files: List[Uploa
             'msg': "Không đủ 3 file audio"
         }
         General_control.save_log(current_user.get("_id"), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
 
     service_id = str(mydb.services.find_one({'sign': 'voiceid'}).get('_id'))
@@ -184,7 +191,7 @@ async def voiceid_speakers_update(speaker_id: str = Form(...), files: List[Uploa
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, '', client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, '', client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -221,10 +228,12 @@ async def voiceid_speakers_update(speaker_id: str = Form(...), files: List[Uploa
                              url, client_request, response.json(), client_request, response.json(), url_gw)
     return response.json()
 
-######
-@VoiceID.delete("/voiceid/speakers/delete", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
-async def voiceid_speakers_delete(speaker_id: str = Form(...), current_user: Schemas_share.User = Depends(get_current_active_user)):
 
+######
+@VoiceID.delete("/voiceid/speakers/delete", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+async def voiceid_speakers_delete(speaker_id: str = Form(...),
+                                  current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_speakers_delete')
     url_gw = setting.BASE_URL + "/voiceid/speakers/delete"
     service_id = str(mydb.services.find_one({'sign': 'voiceid'}).get('_id'))
@@ -238,7 +247,7 @@ async def voiceid_speakers_delete(speaker_id: str = Form(...), current_user: Sch
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -251,12 +260,15 @@ async def voiceid_speakers_delete(speaker_id: str = Form(...), current_user: Sch
     response = requests.request(
         "POST", url, headers=headers, data=payload, files=files)
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, client_request, response.json(), '', response.json(), url_gw)
+                             General_control.getNOW(), url, client_request, response.json(), '', response.json(),
+                             url_gw)
     return response.json()
+
 
 ####
 
-@VoiceID.post("/voiceid/records", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+@VoiceID.post("/voiceid/records", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def voiceid_records_create(speakers: str = Form(...), file: UploadFile = File(...),
                                  current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_records_create')
@@ -269,7 +281,7 @@ async def voiceid_records_create(speakers: str = Form(...), file: UploadFile = F
             client_response = {"status_code": 0,
                                "msg": "Không được để trống file"}
             General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                         General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
             return client_response
 
     client_request['file'] = file.filename
@@ -281,7 +293,7 @@ async def voiceid_records_create(speakers: str = Form(...), file: UploadFile = F
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -304,13 +316,15 @@ async def voiceid_records_create(speakers: str = Form(...), file: UploadFile = F
         os.remove('Manage/file/' + file.filename)
 
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, client_request, response.json(), client_request, response.json(), url_gw)
+                             General_control.getNOW(), url, client_request, response.json(), client_request,
+                             response.json(), url_gw)
     return (response.json())
 
-#####
-@VoiceID.get("/voiceid/records", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
-async def voiceid_records_list(current_user: Schemas_share.User = Depends(get_current_active_user)):
 
+#####
+@VoiceID.get("/voiceid/records", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+async def voiceid_records_list(current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_records_list')
     url_gw = setting.BASE_URL + "/voiceid/records"
     service_id = str(mydb.services.find_one({'sign': 'voiceid'}).get('_id'))
@@ -321,7 +335,7 @@ async def voiceid_records_list(current_user: Schemas_share.User = Depends(get_cu
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, '', client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, '', client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -330,13 +344,14 @@ async def voiceid_records_list(current_user: Schemas_share.User = Depends(get_cu
 
     response = requests.request("GET", url, headers=headers, data=payload)
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, '', response.json(), '', response.json(), url_gw)
+                             General_control.getNOW(), url, '', response.json(), '', response.json(), url_gw)
     return (response.json())
 
-####
-@VoiceID.get("/voiceid/records/{record_id}", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
-async def voiceid_records_detail(record_id: int, current_user: Schemas_share.User = Depends(get_current_active_user)):
 
+####
+@VoiceID.get("/voiceid/records/{record_id}", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+async def voiceid_records_detail(record_id: int, current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_records_detail') + str(record_id)
     url_gw = setting.BASE_URL + F"/voiceid/records/{record_id}"
     client_request = {
@@ -350,7 +365,7 @@ async def voiceid_records_detail(record_id: int, current_user: Schemas_share.Use
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
 
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
@@ -359,12 +374,16 @@ async def voiceid_records_detail(record_id: int, current_user: Schemas_share.Use
 
     response = requests.request("GET", url, headers=headers, data=payload)
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, client_request, response.json(), client_request, response.json(), url_gw)
+                             General_control.getNOW(), url, client_request, response.json(), client_request,
+                             response.json(), url_gw)
     return (response.json())
 
+
 ###
-@VoiceID.post("/voiceid/records/rerun", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
-async def voiceid_records_rerun(record_id: int = Form(...), current_user: Schemas_share.User = Depends(get_current_active_user)):
+@VoiceID.post("/voiceid/records/rerun", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+async def voiceid_records_rerun(record_id: int = Form(...),
+                                current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_records_rerun')
     url_gw = setting.BASE_URL + "/voiceid/records/rerun"
     client_request = {
@@ -378,7 +397,7 @@ async def voiceid_records_rerun(record_id: int = Form(...), current_user: Schema
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
     payload = {'record_id': record_id}
@@ -390,13 +409,16 @@ async def voiceid_records_rerun(record_id: int = Form(...), current_user: Schema
     response = requests.request(
         "POST", url, headers=headers, data=payload, files=files)
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, client_request, response.json(), client_request, response.json(), url_gw)
+                             General_control.getNOW(), url, client_request, response.json(), client_request,
+                             response.json(), url_gw)
     return (response.json())
 
-####
-@VoiceID.delete("/voiceid/records/delete", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
-async def voiceid_records_delete(record_id: int = Form(...), current_user: Schemas_share.User = Depends(get_current_active_user)):
 
+####
+@VoiceID.delete("/voiceid/records/delete", dependencies=[
+    Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
+async def voiceid_records_delete(record_id: int = Form(...),
+                                 current_user: Schemas_share.User = Depends(get_current_active_user)):
     url = VOICE_ID_Controllers.get_link_function_voiceid('voiceid_records_delete')
     url_gw = setting.BASE_URL + "/voiceid/records/delete"
     client_request = {
@@ -410,7 +432,7 @@ async def voiceid_records_delete(record_id: int = Form(...), current_user: Schem
             'msg': 'Too limit'
         }
         General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                     General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
+                                 General_control.getNOW(), url, client_request, client_response, '', '', url_gw)
         return client_response
     General_control.decrease_remaining_request(current_user.get('_id'), service_id)
     payload = {'record_id': record_id}
@@ -421,6 +443,6 @@ async def voiceid_records_delete(record_id: int = Form(...), current_user: Schem
     response = requests.request(
         "POST", url, headers=headers, data=payload, files=files)
     General_control.save_log(current_user.get('_id'), current_user.get('name'), 'voiceid',
-                 General_control.getNOW(), url, client_request, response.json(), client_request, response.json(), url_gw)
+                             General_control.getNOW(), url, client_request, response.json(), client_request,
+                             response.json(), url_gw)
     return (response.json())
-

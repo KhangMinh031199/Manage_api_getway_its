@@ -4,9 +4,11 @@ from jose import JWTError, jwt
 from fastapi import Body, Depends, FastAPI, HTTPException, status, File, Form, UploadFile, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from . import Schemas_Authentication
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage import setting
+
+mydb=mongo_create()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

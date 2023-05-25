@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends
 from pydantic.schema import Generic
 
 from Manage.Authentication.Token import get_current_active_user
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 from fastapi_limiter.depends import RateLimiter
 from Manage.Management_APIs.Controller_APIs import LOOKUP_Controllers, General_control
 import requests
@@ -10,7 +10,9 @@ import json
 from Manage.Management_APIs.Schemas import Schemas_share
 from Manage import setting
 
-LOOKUP=APIRouter(tags=['LookUp'])
+mydb = mongo_create()
+
+LOOKUP = APIRouter(tags=['LookUp'])
 
 @LOOKUP.post("/lookup/basic_personal_information", dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def lookup_basic_personal_information(msisdn: str = Form(...), current_user: Schemas_share.User = Depends(get_current_active_user)):

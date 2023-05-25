@@ -6,7 +6,7 @@ from Manage.Authentication.Token import create_access_token
 from Manage.Management_APIs.Controller_APIs import General_control
 from Manage import setting
 
-auth=APIRouter(tags=['Authentication'])
+auth = APIRouter(tags=['Authentication'])
 
 @auth.post("/auth", response_model=Token)
 async def login(api_key: str = Form(...)):

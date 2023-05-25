@@ -1,7 +1,8 @@
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import json
 import requests
 
+mydb=mongo_create()
 def get_link_function_ocr(apifunction):
     ocr = mydb.services.find_one({"sign": "ocr"})
     for x in ocr.get("api_routing"):
@@ -26,3 +27,10 @@ def get_token_ocr():
     if response.json().get('data'):
         return(response.json().get('data'))
     return ""
+
+### mới 24/04/2023 vs3
+def get_authorization_ocr_v3():
+    username = mydb.services.find_one({'sign': 'ocr_v3'}).get('username')
+    password = mydb.services.find_one({'sign': 'ocr_v3'}).get('password')
+
+    return username, password

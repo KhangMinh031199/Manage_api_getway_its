@@ -5,13 +5,14 @@ from Manage.Authentication.Token import get_current_active_user
 from Manage.Management_APIs.Controller_APIs import OCR_Controllers
 from Manage.Management_APIs.Controller_APIs import General_control
 import secrets
-from Manage.mongo_connect import mydb
+from Manage.mongo_connect import mongo_create
 import os
 import requests
 from bson.objectid import ObjectId
 from Manage import setting
 
-OCR=APIRouter(tags=['OCR'])
+mydb = mongo_create()
+OCR = APIRouter(tags=['OCR'])
 
 @OCR.post('/ocr/id', dependencies=[Depends(RateLimiter(times=setting.RATE_LIMITING_TIMES, seconds=setting.RATE_LIMITING_SECONDS))])
 async def ocr_id(frontImg: UploadFile = File(...), backImg: UploadFile = File(None), current_user: Schemas_share.User = Depends(get_current_active_user)):
